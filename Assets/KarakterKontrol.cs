@@ -4,18 +4,6 @@ using UnityEngine;
 
 public class KarakterKontrol : MonoBehaviour
 {
-    // Ad Soyad: 
-    // Öğrenci Numarası: 
-
-
-    // Soru 1: Karakteri yön tuşları ile hareket ettiren kodu, HareketEt fonksiyonu içerisine yazınız.
-    // Soru 2: Karakterin zıplamasını sağlaması beklenen Zipla metodu doğru bir şekilde çalışmıyor, koddaki hatayı düzeltin.
-    // Soru 3: Karakterin 'Engel' tag'ine sahip objeye temas ettiğinde metin objesine "Oyun Bitti!" yazısını yazdırınız.
-    // Soru 4: Karakterin 'Puan' tag'ine sahip objeye temas ettiğinde skoru 1 arttırınız ve metin objesine yazdırınız.
-
-    // Not: Engel ve Puan nesnelerinin isTrigger özelliği aktiftir.
-
-
     public TMP_Text metin;
     private Rigidbody2D karakterRb;
 
@@ -31,21 +19,36 @@ public class KarakterKontrol : MonoBehaviour
 
     void Update()
     {
-        // Yazdığınız metodları çağırınız.
+        HareketEt();  // Hareket fonksiyonunu çağırıyoruz.
+        Zipla();      // Zipla fonksiyonunu çağırıyoruz.
+    }
+
+    private void HareketEt()
+    {
+        // Karakteri yön tuşları ile yatay eksende hareket ettirme
+        float yatayHareket = Input.GetAxis("Horizontal") * hiz;
+        karakterRb.linearVelocity = new Vector2(yatayHareket, karakterRb.linearVelocity.y); // Yatay hareket sırasında y ekseni hızını koru
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // Soru 3 ve soru 4 burada çözülecek.
+        if (other.CompareTag("Engel"))
+        {
+            metin.text = "Oyun Bitti!";  // Engel ile temas ettiğinde "Oyun Bitti!" yazdırıyoruz.
+        }
+        else if (other.CompareTag("Puan"))
+        {
+            skor += 1;  // Skoru 1 artırıyoruz.
+            metin.text = "Skor: " + skor;  // Güncellenen skoru metin objesine yazdırıyoruz.
+        }
     }
 
     void Zipla()
     {
-        // Space tuşuna basınca karakter zıplamalı ancak aşağıdaki kod hatalı.
-        if (Input.GetKeyDown(KeyCode.Space))
+        // Space tuşuna basıldığında yukarı yönde kuvvet uygulayarak karakterin zıplamasını sağlıyoruz.
+        if (Input.GetKeyDown(KeyCode.Space) && Mathf.Abs(karakterRb.linearVelocity.y) < 0.01f) // Y ekseninde hareket yoksa zıplama yap
         {
-            Vector3 ziplamaYonu = new Vector3(UnityEngine.Random.Range(-1f, 1f), 1, UnityEngine.Random.Range(-1f, 1f));
-            karakterRb.AddForce(ziplamaYonu * (ziplamaGucu / 2), ForceMode2D.Impulse);
+            karakterRb.AddForce(Vector2.up * ziplamaGucu, ForceMode2D.Impulse);
         }
     }
 }
